@@ -1,0 +1,222 @@
+<div class="container">
+  <h2>💰 Ventas - Trabajador</h2>
+
+  <div class="top-bar">
+    <button (click)="mostrarNuevaVenta = true">➕ Nueva Venta</button>
+    <button (click)="mostrarFacturasClientes()">📄 Facturas por Cliente</button>
+  </div>
+
+  <!-- Lista de Ventas -->
+  <div class="ventas-list" *ngIf="!mostrarNuevaVenta">
+    <div class="venta-card" *ngFor="let venta of ventas">
+      <div class="venta-header">
+        <h3>Venta #{{ venta.id }}</h3>
+        <span class="estado-badge" [class.sin-pagar]="venta.estado === 'SIN_PAGAR'"
+              [class.pagada]="venta.estado === 'PAGADA'"
+              [class.facturada]="venta.estado === 'FACTURADA'">
+              {{ venta.estado }}
+            </span>
+      </div>
+
+      <p><strong>Cliente:</strong> {{ venta.cliente?.nombres }} {{ venta.cliente?.apellidos }}</p>
+      <p><strong>Fecha:</strong> {{ venta.fechaVenta | date:'mediumDate' }}</p>
+      <p><strong>Total:</strong> S/ {{ venta.total?.toFixed(2) }}</p>
+
+      <div class="productos-list">
+        <div *ngFor="let detalle of venta.detalles" class="producto-item">
+          {{ detalle.cantidad }} x {{ detalle.producto?.nombre }} (S/ {{ detalle.precioUnitario?.toFixed(2) }})
+        </div>
+      </div>
+
+      <div class="venta-actions">
+        <button *ngIf="venta.estado === 'SIN_PAGAR'" (click)="abrirModalPago(venta)">
+          Marcar como Pagada
+        </button>
+        <button *ngIf="venta.estado === 'PAGADA'" (click)="abrirModalFactura(venta)">
+          Facturar
+        </button>
+        <button class="delete-btn" (click)="eliminarVenta(venta.id!)">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Modal de Facturas por Cliente -->
+  <div class="modal" *ngIf="mostrarFacturasModal">
+    <div class="modal-content">
+      <h3>Facturas por Cliente</h3>
+
+      <div class="form-group">
+        <label>Seleccionar Cliente:</label>
+        <select [(ngModel)]="clienteSeleccionadoFacturas" (change)="cargarFacturasCliente()">
+          <option *ngFor="let cliente of clientes" [value]="cliente.id">
+            {{ cliente.nombres }} {{ cliente.apellidos }} - {{ cliente.numeroDocumento }}
+          </option>
+        </select>
+      </div>
+
+      <div class="facturas-list" *ngIf="facturasCliente.length > 0">
+        <div class="factura-item" *ngFor="let factura of facturasCliente">
+          <div class="factura-header">
+            <h4>Factura #{{ factura.numeroFactura }}</h4>
+            <span class="fecha-factura">{{ factura.fechaEmision | date:'mediumDate' }}</span>
+          </div>
+
+          <p><strong>Total:</strong> S/ {{ factura.total.toFixed(2) }}</p>
+
+          <button (click)="descargarFacturaPdf(factura.id)" class="download-btn">
+            Descargar PDF
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="facturasCliente.length === 0 && clienteSeleccionadoFacturas" class="no-facturas">
+        No se encontraron facturas para este cliente.
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="cerrarModalFactura()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de Nueva Venta -->
+  <div class="venta-form" *ngIf="mostrarNuevaVenta">
+    <h3>Nueva Venta</h3>
+
+    <div class="form-section">
+      <h4>1. Seleccionar Cliente</h4>
+      <select [(ngModel)]="nuevaVenta.clienteId" required>
+        <option *ngFor="let cliente of clientes" [value]="cliente.id">
+          {{ cliente.nombres }} {{ cliente.apellidos }} - {{ cliente.tipoDocumento }}: {{ cliente.numeroDocumento }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-section">
+      <h4>2. Agregar Productos</h4>
+      <div class="add-product">
+        <select [(ngModel)]="productoSeleccionado" (change)="actualizarPrecioUnitario()">
+          <option *ngFor="let producto of productosDisponibles" [ngValue]="producto">
+            {{ producto.nombre }} (Stock: {{ producto.stock }}) - S/ {{ producto.precioUnitario.toFixed(2) }}
+          </option>
+        </select>
+        <input type="number" [(ngModel)]="cantidadProducto" min="1" [max]="productoSeleccionado?.stock || 1" placeholder="Cantidad">
+        <button (click)="agregarProducto()" [disabled]="!productoSeleccionado || !cantidadProducto || cantidadProducto <= 0">
+          Agregar
+        </button>
+      </div>
+
+      <div class="productos-agregados">
+        <h5>Productos en la venta:</h5>
+        <div *ngFor="let detalle of nuevaVenta.detalles; let i = index" class="producto-agregado">
+          <span>{{ detalle.cantidad }} x {{ detalle.producto?.nombre }} - S/ {{ detalle.subtotal?.toFixed(2) }}</span>
+          <button (click)="eliminarProducto(i)">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>3. Observaciones</h4>
+      <textarea [(ngModel)]="nuevaVenta.observacion" placeholder="Observaciones adicionales..."></textarea>
+    </div>
+
+    <div class="totales">
+      <h4>Total: S/ {{ calcularTotal().toFixed(2) }}</h4>
+    </div>
+
+    <div class="form-actions">
+      <button (click)="registrarVenta()" [disabled]="nuevaVenta.detalles.length === 0 || !nuevaVenta.clienteId">
+        Registrar Venta
+      </button>
+      <button class="cancel-btn" (click)="cancelarNuevaVenta()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Modal de Pago -->
+  <div class="modal" *ngIf="mostrarModalPago">
+    <div class="modal-content">
+      <h3>Registrar Pago</h3>
+
+      <div class="form-group">
+        <label>Método de Pago:</label>
+        <select [(ngModel)]="pagoRequest.metodo">
+          <option value="CONTADO">Contado</option>
+          <option value="TARJETA">Tarjeta</option>
+          <option value="TRANSFERENCIA">Transferencia</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="pagoRequest.metodo === 'TRANSFERENCIA'">
+        <label>Comprobante:</label>
+        <input type="file" (change)="onComprobanteChange($event)">
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="registrarPago()">Confirmar Pago</button>
+        <button class="cancel-btn" (click)="mostrarModalPago = false">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Facturación - Versión Mejorada -->
+  <div class="modal" *ngIf="mostrarModalFactura">
+    <div class="modal-content">
+      <h3>Generar Factura</h3>
+
+      <div *ngIf="ventaAFacturar">
+        <div class="form-group">
+          <label>Moneda:</label>
+          <select [(ngModel)]="facturaRequest.moneda">
+            <option value="PEN">Soles (PEN)</option>
+            <option value="USD">Dólares (USD)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Forma de Pago:</label>
+          <select [(ngModel)]="facturaRequest.formaPago">
+            <option value="CONTADO">Contado</option>
+            <option value="CREDITO">Crédito</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Medio de Pago:</label>
+          <select [(ngModel)]="facturaRequest.medioPago">
+            <option value="EFECTIVO">Efectivo</option>
+            <option value="TARJETA">Tarjeta</option>
+            <option value="TRANSFERENCIA">Transferencia</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Observaciones:</label>
+          <textarea [(ngModel)]="facturaRequest.observaciones" placeholder="Opcional"></textarea>
+        </div>
+
+        <div class="resumen-factura">
+          <h4>Resumen de Factura</h4>
+          <p><strong>Cliente:</strong> {{ obtenerNombreCliente(ventaAFacturar.clienteId) }}</p>
+          <p><strong>Total:</strong> S/ {{ ventaAFacturar.total?.toFixed(2) }}</p>
+
+          <div class="productos-factura">
+            <h5>Productos:</h5>
+            <div *ngFor="let detalle of ventaAFacturar.detalles" class="producto-factura">
+              {{ detalle.cantidad }} x {{ obtenerNombreProducto(detalle.productoId) }} -
+              S/ {{ (detalle.cantidad * detalle.precioUnitario).toFixed(2) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="generarFactura()" [disabled]="generandoFactura">
+          <span *ngIf="!generandoFactura">Generar Factura</span>
+          <span *ngIf="generandoFactura">Procesando...</span>
+        </button>
+        <button class="cancel-btn" (click)="cerrarModalFactura()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>

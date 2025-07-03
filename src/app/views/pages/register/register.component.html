@@ -1,36 +1,116 @@
-<div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center">
+<div class="register-container">
   <c-container>
     <c-row class="justify-content-center">
-      <c-col lg="7" md="9" xl="6">
-        <c-card class="mx-4">
-          <c-card-body class="p-4">
-            <form cForm>
-              <h1>Register</h1>
-              <p class="text-body-secondary">Create your account</p>
-              <c-input-group class="mb-3">
-                <span cInputGroupText>
+      <c-col lg="6" md="8" xl="5">
+        <c-card class="register-card">
+          <c-card-body class="p-4 p-lg-5">
+            <form cForm (ngSubmit)="onSubmit()" class="register-form">
+              <div class="text-center mb-4">
+                <h1 class="register-title">Create Account</h1>
+                <p class="register-subtitle">Join our community today</p>
+              </div>
+
+              <!-- Username Field -->
+              <c-input-group class="mb-3 input-field">
+                <span cInputGroupText class="input-icon">
                   <svg cIcon name="cilUser"></svg>
                 </span>
-                <input autoComplete="name" cFormControl placeholder="Username" />
+                <input
+                  [(ngModel)]="user.name"
+                  name="name"
+                  autoComplete="name"
+                  cFormControl
+                  placeholder="Username"
+                  required
+                  class="input-control"
+                />
               </c-input-group>
-              <c-input-group class="mb-3">
-                <span cInputGroupText>&#64;</span>
-                <input autoComplete="email" cFormControl placeholder="Email" />
+
+              <!-- Email Field -->
+              <c-input-group class="mb-3 input-field">
+                <span cInputGroupText class="input-icon">
+                  <svg cIcon name="cilEnvelopeOpen"></svg>
+                </span>
+                <input
+                  [(ngModel)]="user.email"
+                  name="email"
+                  autoComplete="email"
+                  cFormControl
+                  placeholder="Email"
+                  type="email"
+                  required
+                  class="input-control"
+                />
               </c-input-group>
-              <c-input-group class="mb-3">
-                <span cInputGroupText>
+
+              <!-- Password Field -->
+              <c-input-group class="mb-3 input-field">
+                <span cInputGroupText class="input-icon">
                   <svg cIcon name="cilLockLocked"></svg>
                 </span>
-                <input autoComplete="new-password" cFormControl placeholder="Password" type="password" />
+                <input
+                  [(ngModel)]="user.password"
+                  name="password"
+                  (input)="checkPasswordStrength(); checkPasswordMatch()"
+                  autoComplete="new-password"
+                  cFormControl
+                  placeholder="Password"
+                  type="password"
+                  required
+                  class="input-control"
+                />
               </c-input-group>
-              <c-input-group class="mb-4">
-                <span cInputGroupText>
+
+              <!-- Password Strength Meter -->
+              <div class="password-strength mb-3" *ngIf="user.password">
+                <div class="strength-meter">
+                  <div class="strength-bar" [style.width.%]="passwordStrength"
+                       [class.weak]="passwordStrength <= 40"
+                       [class.medium]="passwordStrength > 40 && passwordStrength <= 80"
+                       [class.strong]="passwordStrength > 80"></div>
+                </div>
+                <small class="strength-text">
+                  Password strength:
+                  <span *ngIf="passwordStrength <= 40">Weak</span>
+                  <span *ngIf="passwordStrength > 40 && passwordStrength <= 80">Medium</span>
+                  <span *ngIf="passwordStrength > 80">Strong</span>
+                </small>
+              </div>
+
+              <!-- Confirm Password Field -->
+              <c-input-group class="mb-4 input-field">
+                <span cInputGroupText class="input-icon">
                   <svg cIcon name="cilLockLocked"></svg>
                 </span>
-                <input autoComplete="new-password" cFormControl placeholder="Repeat password" type="password" />
+                <input
+                  [(ngModel)]="user.confirmPassword"
+                  name="confirmPassword"
+                  (input)="checkPasswordMatch()"
+                  autoComplete="new-password"
+                  cFormControl
+                  placeholder="Confirm Password"
+                  type="password"
+                  required
+                  class="input-control"
+                />
               </c-input-group>
+
+              <!-- Password Match Error -->
+              <div class="alert alert-danger mb-3" *ngIf="submitted && !passwordMatch">
+                Passwords do not match!
+              </div>
+
+              <!-- Submit Button -->
               <div class="d-grid">
-                <button cButton color="success">Create Account</button>
+                <button cButton color="gradient" class="register-button">
+                  <span *ngIf="!submitted">Create Account</span>
+                  <span *ngIf="submitted && passwordMatch">Processing...</span>
+                </button>
+              </div>
+
+              <!-- Login Link -->
+              <div class="text-center mt-4">
+                <p class="login-link">Already have an account? <a routerLink="/login">Sign in</a></p>
               </div>
             </form>
           </c-card-body>

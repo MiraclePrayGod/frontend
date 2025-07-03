@@ -1,0 +1,411 @@
+/* Variables de color */
+$plomo-oscuro: #5a6268;
+$plomo-medio: #6c757d;
+$plomo-claro: #e9ecef;
+$plomo-humo: #f8f9fa;
+$azul-acero: #4a6fa5;
+$verde-petroleo: #20c997;
+$borde-suave: #dee2e6;
+
+/* Estilos base */
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: $plomo-humo;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(145deg, #ffffff, $plomo-humo);
+  border-radius: 0.5rem;
+  border: 1px solid $borde-suave;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    margin-top: 0;
+    color: $plomo-oscuro;
+    border-bottom: 2px solid $plomo-claro;
+    padding-bottom: 0.75rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+}
+
+/* Selectores y controles de formulario */
+select, input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid $borde-suave;
+  border-radius: 0.375rem;
+  background-color: white;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  color: $plomo-oscuro;
+
+  &:focus {
+    border-color: $azul-acero;
+    box-shadow: 0 0 0 0.2rem rgba($azul-acero, 0.25);
+    outline: none;
+  }
+}
+
+/* Tarjetas de venta */
+.venta-card {
+  border: 1px solid $borde-suave;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background-color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: $plomo-medio;
+  }
+}
+
+.venta-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: $plomo-oscuro;
+  font-size: 0.95rem;
+}
+
+.total {
+  color: $verde-petroleo;
+  font-weight: 700;
+}
+
+.detalles {
+  margin: 1rem 0;
+}
+
+.detalle-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed $plomo-claro;
+  font-size: 0.9rem;
+  color: $plomo-medio;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Botones */
+.pagar-btn, .facturar-btn, .visualizar-btn {
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.pagar-btn {
+  background-color: $azul-acero;
+  color: white;
+
+  &:hover {
+    background-color: darken($azul-acero, 8%);
+  }
+}
+
+.facturar-btn {
+  background-color: $verde-petroleo;
+  color: white;
+
+  &:hover {
+    background-color: darken($verde-petroleo, 8%);
+  }
+}
+
+.visualizar-btn {
+  background-color: $plomo-medio;
+  color: white;
+  margin-left: 0.75rem;
+
+  &:hover {
+    background-color: darken($plomo-medio, 8%);
+  }
+}
+
+/* Estados */
+.empty-state {
+  color: $plomo-medio;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+  background-color: rgba($plomo-claro, 0.5);
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba($plomo-oscuro, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid $plomo-claro;
+
+  h3 {
+    margin-top: 0;
+    color: $plomo-oscuro;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: $plomo-oscuro;
+    font-size: 0.9rem;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid $borde-suave;
+    border-radius: 0.375rem;
+    min-height: 100px;
+    resize: vertical;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:first-child {
+      background-color: $plomo-medio;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: darken($plomo-medio, 10%);
+      }
+    }
+
+    &:last-child {
+      background-color: $verde-petroleo;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: darken($verde-petroleo, 10%);
+      }
+    }
+  }
+}
+
+/* Facturas */
+.factura-card {
+  border: 1px solid $borde-suave;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: $verde-petroleo;
+  }
+}
+
+.factura-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: $plomo-oscuro;
+}
+
+/* Estados de licencia */
+.estado-licencia {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: $plomo-oscuro;
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-left: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  .estado-aceptado {
+    background-color: rgba($verde-petroleo, 0.15);
+    color: darken($verde-petroleo, 20%);
+    border: 1px solid rgba($verde-petroleo, 0.3);
+  }
+
+  .estado-pendiente {
+    background-color: rgba(#ffc107, 0.15);
+    color: darken(#ffc107, 30%);
+    border: 1px solid rgba(#ffc107, 0.3);
+  }
+
+  .estado-rechazado {
+    background-color: rgba(#dc3545, 0.15);
+    color: darken(#dc3545, 10%);
+    border: 1px solid rgba(#dc3545, 0.3);
+  }
+}
+
+/* Detalles de productos */
+.producto-nombre {
+  font-weight: 600;
+  color: $plomo-oscuro;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.producto-descripcion {
+  color: $plomo-medio;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.producto-cantidad, .producto-subtotal {
+  font-size: 0.9rem;
+  color: $plomo-oscuro;
+}
+
+.producto-subtotal {
+  font-weight: 600;
+}
+
+/* Tooltips para botones deshabilitados */
+.facturar-btn:disabled,
+.visualizar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  position: relative;
+  background-color: $plomo-claro !important;
+  color: $plomo-medio !important;
+
+  &:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: $plomo-oscuro;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    white-space: nowrap;
+    z-index: 100;
+    font-size: 0.8rem;
+    font-weight: normal;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .venta-header, .factura-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .pagar-btn, .facturar-btn, .visualizar-btn {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}

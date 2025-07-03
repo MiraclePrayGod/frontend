@@ -1,1 +1,210 @@
-<p>ventasss works!</p>
+<div class="container">
+  <h2>🛒 Gestión de Compras y Pagos</h2>
+
+  <!-- Selección de Cliente -->
+  <div class="section">
+    <h3>Seleccionar Cliente</h3>
+    <select [(ngModel)]="clienteSeleccionado" (change)="cargarVentas()">
+      <option [ngValue]="null" disabled>-- Seleccione un cliente --</option>
+      <option *ngFor="let cliente of clientes" [ngValue]="cliente.id">
+        {{ cliente.nombre }} (ID: {{ cliente.id }})
+      </option>
+    </select>
+  </div>
+
+  <!-- Ventas Pendientes -->
+  <div class="section" *ngIf="clienteSeleccionado">
+    <h3>🔄 Tus Compras Pendientes de Pago</h3>
+    <div *ngIf="ventasPendientes.length === 0" class="empty-state">
+      No hay ventas pendientes para este cliente
+    </div>
+    <div class="venta-card" *ngFor="let venta of ventasPendientes">
+      <div class="venta-header">
+        <span>Venta #{{ venta.id }}</span>
+        <span>{{ venta.fechaVenta | date:'mediumDate' }}</span>
+        <span class="total">Total: S/ {{ venta.total | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="detalles">
+        <div *ngFor="let detalle of venta.detalles" class="detalle-item">
+          <span>{{ detalle.producto?.nombre || 'Producto ' + detalle.productoId }}</span>
+          <span>{{ detalle.cantidad }} x S/ {{ detalle.precioUnitario | number:'1.2-2' }}</span>
+          <span>S/ {{ detalle.subtotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <button class="pagar-btn" (click)="mostrarFormularioPago(venta)">
+        💳 Pagar Compra
+      </button>
+    </div>
+  </div>
+
+
+
+  <div class="section" *ngIf="clienteSeleccionado">
+    <h3>✅ Compras Pagadas</h3>
+    <div class="venta-card" *ngFor="let venta of ventasPagadas">
+      <div class="venta-header">
+        <span>Venta #{{ venta.id }}</span>
+        <span>{{ venta.fechaVenta | date:'mediumDate' }}</span>
+        <span class="total">Total: S/ {{ venta.total | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="estado-licencia" *ngIf="venta.estadoLicencia">
+        <strong>Estado de Licencia:</strong>
+        <span [ngClass]="{
+        'estado-aceptado': venta.estadoLicencia === 'Aceptado',
+        'estado-pendiente': venta.estadoLicencia === 'Pendiente',
+        'estado-rechazado': venta.estadoLicencia === 'Rechazado'
+      }">{{ venta.estadoLicencia }}</span>
+      </div>
+
+      <div class="detalles">
+        <div *ngFor="let detalle of venta.detalles" class="detalle-item">
+          <span>{{ detalle.producto?.nombre || 'Producto ' + detalle.productoId }}</span>
+          <span>{{ detalle.cantidad }} x S/ {{ detalle.precioUnitario | number:'1.2-2' }}</span>
+          <span>S/ {{ detalle.subtotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- En la sección de Compras Pagadas -->
+      <!-- En la sección de Compras Pagadas -->
+      <button
+        (click)="abrirModalFactura(venta)"
+        [disabled]="!puedeFacturar(venta)"
+        class="facturar-btn"
+        [title]="!puedeFacturar(venta) ? getMotivoNoFacturable(venta) : 'Generar factura para esta venta'">
+        Facturar
+      </button>
+
+
+    </div>
+  </div>
+</div>
+<!<!-- Facturas Emitidas -->
+<div class="section" *ngIf="clienteSeleccionado">
+  <h3>📄 Facturas Emitidas</h3>
+  <div *ngIf="facturasEmitidas.length === 0" class="empty-state">
+    No hay facturas emitidas para este cliente
+  </div>
+  <div class="factura-card" *ngFor="let factura of facturasEmitidas">
+    <div class="factura-header">
+      <span>Factura #{{ factura.numeroFactura }}</span>
+      <span>{{ factura.fechaEmision | date:'mediumDate' }}</span>
+      <span class="total">Total: S/ {{ factura.total | number:'1.2-2' }}</span>
+    </div>
+
+    <div class="factura-info">
+      <div><strong>Cliente:</strong> {{ factura.cliente.nombre }}</div>
+      <div><strong>RUC/DNI:</strong> {{ factura.cliente.rucDni || 'No especificado' }}</div>
+      <div><strong>Forma de pago:</strong> {{ factura.formaPago }}</div>
+    </div>
+
+    <div *ngFor="let detalle of factura.items" class="detalle-item">
+      <span class="producto-nombre">Nombre: {{ detalle.nombreProducto }}</span><br />
+      <span class="producto-descripcion">Descripción: {{ detalle.descripcion }}</span><br />
+      <span class="producto-cantidad">{{ detalle.cantidad }} x S/ {{ detalle.precioUnitario | number:'1.2-2' }}</span>
+      <span class="producto-subtotal">S/ {{ detalle.subtotal | number:'1.2-2' }}</span>
+    </div>
+
+    <div class="factura-actions">
+      <button (click)="descargarFacturaPdf(factura.id)" class="visualizar-btn">
+        📄 Visualizar Factura
+      </button>
+    </div>
+  </div>
+</div>
+<!-- Modal de Facturación -->
+<div class="modal" *ngIf="mostrarModalFactura">
+  <div class="modal-content">
+    <h3>Generar Factura</h3>
+
+    <div *ngIf="ventaAFacturar">
+      <div class="form-group">
+        <label>Moneda:</label>
+        <select [(ngModel)]="facturaRequest.moneda">
+          <option value="PEN">Soles (PEN)</option>
+          <option value="USD">Dólares (USD)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Forma de Pago:</label>
+        <select [(ngModel)]="facturaRequest.formaPago">
+          <option value="CONTADO">Contado</option>
+          <option value="CREDITO">Crédito</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Medio de Pago:</label>
+        <select [(ngModel)]="facturaRequest.medioPago">
+          <option value="EFECTIVO">Efectivo</option>
+          <option value="TARJETA">Tarjeta</option>
+          <option value="TRANSFERENCIA">Transferencia</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Observaciones:</label>
+        <textarea [(ngModel)]="facturaRequest.observaciones" placeholder="Opcional"></textarea>
+      </div>
+
+      <div class="resumen-factura">
+        <h4>Resumen de Factura</h4>
+        <p><strong>Cliente:</strong> {{ ventaAFacturar.clienteId }}</p>
+        <p><strong>Total:</strong> S/ {{ ventaAFacturar.total?.toFixed(2) }}</p>
+
+        <div class="productos-factura">
+          <h5>Productos:</h5>
+          <div *ngFor="let detalle of ventaAFacturar.detalles" class="producto-factura">
+            {{ detalle.cantidad }} x {{ detalle.producto?.nombre || 'Producto ' + detalle.productoId }} -
+            S/ {{ (detalle.cantidad * detalle.precioUnitario).toFixed(2) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button (click)="generarFactura()" [disabled]="generandoFactura">
+        <span *ngIf="!generandoFactura">Generar Factura</span>
+        <span *ngIf="generandoFactura">Procesando...</span>
+      </button>
+      <button class="cancel-btn" (click)="cerrarModalFactura()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Formulario de Pago (Modal) -->
+<div class="modal" *ngIf="mostrarPago">
+  <div class="modal-content">
+    <h3>Pagar Venta #{{ ventaSeleccionada?.id }}</h3>
+    <p>Total a pagar: S/ {{ ventaSeleccionada?.total | number:'1.2-2' }}</p>
+
+    <form (ngSubmit)="procesarPago()" #pagoForm="ngForm">
+      <div class="form-group">
+        <label>Método de Pago:</label>
+        <select [(ngModel)]="metodoPago" name="metodoPago" required>
+          <option value="">-- Seleccione --</option>
+          <option value="TRANSFERENCIA">Transferencia</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="metodoPago === 'TRANSFERENCIA'">
+        <label>Comprobante de Transferencia:</label>
+        <input type="file" (change)="onFileSelected($event)" accept="image/*,.pdf" required>
+        <small *ngIf="archivoSeleccionado">Archivo seleccionado: {{ archivoSeleccionado.name }}</small>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="cancelarPago()">Cancelar</button>
+        <button type="submit" [disabled]="pagoForm.invalid || (metodoPago === 'TRANSFERENCIA' && !archivoSeleccionado)">
+          Confirmar Pago
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

@@ -1,0 +1,17 @@
+<div class="container">
+  <h2>📊 Reportes</h2>
+  <div style="max-width: 400px; margin: auto;">
+    <canvas baseChart
+      [data]="chartData"
+      [type]="chartType">
+    </canvas>
+  </div>
+  <div class="info">
+    <h3>Resumen de Ventas</h3>
+    <ul>
+      <li *ngFor="let estado of chartData.labels; let i = index">
+        {{ estado }}: {{ chartData.datasets[0].data[i] }}
+      </li>
+    </ul>
+  </div>
+</div>

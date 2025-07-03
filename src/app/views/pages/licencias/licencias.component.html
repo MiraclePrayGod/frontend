@@ -1,0 +1,113 @@
+<div class="container">
+  <h2><i class="bi bi-key"></i> Mis Licencias</h2>
+
+  <!-- Filtros -->
+  <div class="licencias-filtros">
+    <input
+      type="text"
+      [(ngModel)]="filtroTexto"
+      (ngModelChange)="onFiltroTextoChange()"
+      placeholder="Buscar por nombre, correo, DNI o RUC..."
+      class="filtro-input"
+    />
+    <select [(ngModel)]="filtroEstado" class="filtro-select">
+      <option value="todos">Todos</option>
+      <option value="vigentes">Solo Vigentes</option>
+      <option value="expirados">Solo Expirados</option>
+    </select>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Activación</th>
+          <th>Expiración</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let licencia of licenciasFiltradas">
+          <td>{{ licencia.id }}</td>
+          <td>
+            {{ licencia.clienteDto?.nombres }} {{ licencia.clienteDto?.apellidos }}
+            <br>
+            <small>
+              {{ licencia.clienteDto?.correo }}<br>
+              <span *ngIf="licencia.clienteDto?.numeroDocumento">DNI: {{ licencia.clienteDto?.numeroDocumento }}</span>
+              <span *ngIf="licencia.clienteDto?.ruc">RUC: {{ licencia.clienteDto?.ruc }}</span>
+            </small>
+          </td>
+          <td>{{ licencia.tipoLicencia }}</td>
+          <td>{{ licencia.fechaActivacion | date:'mediumDate' }}</td>
+          <td>{{ licencia.fechaExpiracion | date:'mediumDate' }}</td>
+          <td>
+            <span [class]="licencia.estado ? 'badge bg-success' : 'badge bg-secondary'">
+              {{ licencia.estado ? 'Activa' : 'Expirada' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-icon details" (click)="verDetalles(licencia)" title="Ver detalles">
+              <i class="bi bi-eye-fill"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="licenciasFiltradas.length === 0" class="empty-state">
+      No hay licencias que coincidan con la búsqueda.
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalles -->
+<div class="modal-overlay" *ngIf="mostrarDetalles && licenciaSeleccionada">
+  <div class="modal-content card">
+    <div class="modal-header">
+      <h3><i class="bi bi-key"></i> Detalles de Licencia #{{ licenciaSeleccionada.id }}</h3>
+      <button class="btn-icon close" (click)="cerrarDetalles()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Cliente:</strong> {{ licenciaSeleccionada.clienteDto?.nombres }} {{ licenciaSeleccionada.clienteDto?.apellidos }}</p>
+      <p><strong>Correo:</strong> {{ licenciaSeleccionada.clienteDto?.correo }}</p>
+      <p *ngIf="licenciaSeleccionada.clienteDto?.numeroDocumento"><strong>DNI:</strong> {{ licenciaSeleccionada.clienteDto?.numeroDocumento }}</p>
+      <p *ngIf="licenciaSeleccionada.clienteDto?.ruc"><strong>RUC:</strong> {{ licenciaSeleccionada.clienteDto?.ruc }}</p>
+      <p><strong>Tipo de Licencia:</strong> {{ licenciaSeleccionada.tipoLicencia }}</p>
+      <p><strong>Fecha Activación:</strong> {{ licenciaSeleccionada.fechaActivacion | date:'mediumDate' }}</p>
+      <p><strong>Fecha Expiración:</strong> {{ licenciaSeleccionada.fechaExpiracion | date:'mediumDate' }}</p>
+      <p><strong>Estado:</strong>
+        <span [class]="licenciaSeleccionada.estado ? 'badge bg-success' : 'badge bg-secondary'">
+          {{ licenciaSeleccionada.estado ? 'Activa' : 'Expirada' }}
+        </span>
+      </p>
+      <h4>Detalle de Ventas Asociadas</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>ID Venta</th>
+            <th>Producto</th>
+            <th>Código Licencia</th>
+            <th>Contraseña</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let det of licenciaSeleccionada.detalles">
+            <td>{{ det.ventaId }}</td>
+            <td>{{ det.productoDto?.nombre || det.productoId }}</td>
+            <td>{{ det.codigoLicencia }}</td>
+            <td>{{ det.contrasena }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarDetalles()">Cerrar</button>
+    </div>
+  </div>
+</div>

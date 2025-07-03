@@ -1,533 +1,173 @@
-import { Component, OnInit } from '@angular/core';
-import {DecimalPipe} from "@angular/common";
-import {RouterModule} from "@angular/router";
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { NgbCarouselModule, NgbCarouselConfig, NgbSlideEvent, NgbSlideEventSource } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-
+  selector: 'app-dcliente',
   standalone: true,
-  selector: 'app-dashboard',
-  template: `
-    <div class="dashboard-container">
-      <!-- Header -->
-      <header class="dashboard-header">
-        <h1>ContaCloud Dashboard</h1>
-        <div class="user-profile">
-          <span class="username">Admin</span>
-          <i class="bi bi-person-circle"></i>
-        </div>
-      </header>
-
-      <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div *ngFor="let stat of stats" class="stat-card" [class.trend-up]="stat.trend === 'up'"
-             [class.trend-down]="stat.trend === 'down'" [class.trend-stable]="stat.trend === 'stable'">
-          <div class="stat-icon">
-            <i [class]="stat.icon"></i>
-          </div>
-          <div class="stat-content">
-            <h3>{{stat.title}}</h3>
-            <p class="stat-value">{{stat.value | number}}</p>
-            <div class="stat-trend">
-              <i class="bi"
-                 [class.bi-arrow-up]="stat.trend === 'up'"
-                 [class.bi-arrow-down]="stat.trend === 'down'"
-                 [class.bi-dash]="stat.trend === 'stable'"></i>
-              <span>{{stat.percentage}}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="main-content">
-        <!-- Charts Section -->
-        <div class="charts-section">
-          <div class="chart-container">
-            <h2>Ventas por Mes</h2>
-            <div class="chart-placeholder">
-              <!-- Aquí iría tu gráfico de barras -->
-              <div class="mock-chart bar-chart">
-                <div *ngFor="let item of barChartData.datasets[0].data; let i = index"
-                     class="bar" [style.height]="(item / 5000 * 100) + '%'">
-                  <span class="bar-value">{{item}}</span>
-                </div>
-              </div>
-              <div class="chart-labels">
-                <span *ngFor="let label of barChartData.labels">{{label}}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="chart-container">
-            <h2>Distribución de Productos</h2>
-            <div class="chart-placeholder">
-              <!-- Aquí iría tu gráfico de pie -->
-              <div class="mock-chart pie-chart">
-                <div class="pie-slice"
-                     *ngFor="let item of pieChartData.datasets[0].data; let i = index"
-                     [style.--slice-value]="item"
-                     [style.--slice-color]="pieChartData.datasets[0].backgroundColor[i]">
-                </div>
-              </div>
-              <div class="pie-legend">
-                <div *ngFor="let label of pieChartData.labels; let i = index" class="legend-item">
-                  <span class="legend-color" [style.background]="pieChartData.datasets[0].backgroundColor[i]"></span>
-                  <span class="legend-label">{{label}} ({{pieChartData.datasets[0].data[i]}}%)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="activity-section">
-          <h2>Actividad Reciente</h2>
-          <div class="activity-list">
-            <div class="activity-item">
-              <i class="bi bi-receipt"></i>
-              <div class="activity-content">
-                <p>Factura #4582 generada</p>
-                <small>Hace 15 minutos</small>
-              </div>
-            </div>
-            <div class="activity-item">
-              <i class="bi bi-cash-coin"></i>
-              <div class="activity-content">
-                <p>Pago recibido de Cliente S.A.</p>
-                <small>Hace 2 horas</small>
-              </div>
-            </div>
-            <div class="activity-item">
-              <i class="bi bi-person-plus"></i>
-              <div class="activity-content">
-                <p>Nuevo cliente registrado</p>
-                <small>Hoy, 09:30 AM</small>
-              </div>
-            </div>
-            <div class="activity-item">
-              <i class="bi bi-graph-up"></i>
-              <div class="activity-content">
-                <p>Reporte mensual generado</p>
-                <small>Ayer, 5:45 PM</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="actions-grid">
-        <button class="action-btn" routerLink="/pages/ventas">
-          <i class="bi bi-file-earmark-text"></i>
-          <span>Nueva Venta</span>
-        </button>
-
-        <button class="action-btn" routerLink="/pages/clientes">
-          <i class="bi bi-person-plus"></i>
-          <span>Agregar Cliente</span>
-        </button>
-
-        <button class="action-btn" routerLink="/pages/productos">
-          <i class="bi bi-cash-coin"></i>
-          <span>Agregar/Modificar Productos</span>
-        </button>
-      </div>
-
-
-
-      <button class="action-btn">
-            <i class="bi bi-graph-up"></i>
-            <span>Generar Reporte</span>
-          </button>
-        </div>
-  `,
+  templateUrl: './dcliente.component.html',
+  styleUrls: ['./dcliente.component.scss'],
   imports: [
-    DecimalPipe,
-    RouterModule
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NgbCarouselModule
   ],
-  styles: [`
-    /* Estilos generales */
-    :host {
-      display: block;
-      height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .dashboard-container {
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      gap: 1.5rem;
-      height: 100%;
-      padding: 1.5rem;
-      background-color: #f5f7fa;
-      color: #333;
-    }
-
-    /* Header */
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .dashboard-header h1 {
-      margin: 0;
-      color: #2c3e50;
-      font-size: 1.8rem;
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .user-profile i {
-      font-size: 1.5rem;
-      color: #0d6efd;
-    }
-
-    /* Stats Cards */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .stat-card {
-      background: white;
-      border-radius: 10px;
-      padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-
-    .stat-card.trend-up .stat-icon {
-      background-color: rgba(13, 110, 253, 0.1);
-      color: #0d6efd;
-    }
-
-    .stat-card.trend-down .stat-icon {
-      background-color: rgba(220, 53, 69, 0.1);
-      color: #dc3545;
-    }
-
-    .stat-card.trend-stable .stat-icon {
-      background-color: rgba(108, 117, 125, 0.1);
-      color: #6c757d;
-    }
-
-    .stat-content {
-      flex: 1;
-    }
-
-    .stat-content h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1rem;
-      color: #6c757d;
-      font-weight: 500;
-    }
-
-    .stat-value {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-
-    .stat-trend {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 0.9rem;
-    }
-
-    .stat-card.trend-up .stat-trend {
-      color: #198754;
-    }
-
-    .stat-card.trend-down .stat-trend {
-      color: #dc3545;
-    }
-
-    .stat-card.trend-stable .stat-trend {
-      color: #6c757d;
-    }
-
-    /* Main Content */
-    .main-content {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 1.5rem;
-    }
-
-    /* Charts Section */
-    .charts-section {
-      display: grid;
-      grid-template-rows: auto auto;
-      gap: 1.5rem;
-    }
-
-    .chart-container {
-      background: white;
-      border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .chart-container h2 {
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      font-size: 1.2rem;
-      color: #2c3e50;
-    }
-
-    .chart-placeholder {
-      height: 250px;
-      position: relative;
-    }
-
-    /* Mock Charts */
-    .mock-chart {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      padding: 1rem 0;
-    }
-
-    .bar-chart {
-      gap: 1rem;
-    }
-
-    .bar {
-      width: 50px;
-      background-color: #0d6efd;
-      border-radius: 5px 5px 0 0;
-      position: relative;
-      transition: height 0.5s ease;
-    }
-
-    .bar-value {
-      position: absolute;
-      top: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      background: white;
-      padding: 2px 5px;
-      border-radius: 3px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .chart-labels {
-      display: flex;
-      justify-content: space-around;
-      padding-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #6c757d;
-    }
-
-    .pie-chart {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      margin: 0 auto;
-      background: conic-gradient(
-          var(--slice-color) calc(var(--slice-value) * 1%),
-          transparent 0
-      );
-    }
-
-    .pie-legend {
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .legend-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-    }
-
-    /* Activity Section */
-    .activity-section {
-      background: white;
-      border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .activity-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .activity-item {
-      display: flex;
-      gap: 1rem;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .activity-item:last-child {
-      border-bottom: none;
-    }
-
-    .activity-item i {
-      font-size: 1.2rem;
-      color: #0d6efd;
-    }
-
-    .activity-content p {
-      margin: 0 0 0.2rem 0;
-      font-weight: 500;
-    }
-
-    .activity-content small {
-      color: #6c757d;
-      font-size: 0.8rem;
-    }
-
-    /* Quick Actions */
-    .quick-actions {
-      background: white;
-      border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .actions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-
-    .action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: #f8f9fa;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-      background: #e9ecef;
-      transform: translateY(-2px);
-    }
-
-    .action-btn i {
-      font-size: 1.5rem;
-      color: #0d6efd;
-    }
-
-    .action-btn span {
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-      .main-content {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  `]
 })
-export class DashboardComponent implements OnInit {
-  stats = [
+export class DClienteComponent {
+
+// Datos para el carrusel
+  carouselImages = [
     {
-      title: 'Total de Ventas',
-      value: 23450,
-      trend: 'up',
-      percentage: '+12.5%',
-      icon: 'bi bi-bar-chart-line'
+      src: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      alt: 'Contabilidad moderna',
+      caption: 'Gestión financiera inteligente'
     },
     {
-      title: 'Clientes Nuevos',
-      value: 150,
-      trend: 'stable',
-      percentage: '0%',
-      icon: 'bi bi-person-check'
+      src: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      alt: 'Análisis de datos',
+      caption: 'Toma decisiones basadas en datos'
     },
     {
-      title: 'Reembolsos',
-      value: 5,
-      trend: 'down',
-      percentage: '-3%',
-      icon: 'bi bi-arrow-counterclockwise'
+      src: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80',
+      alt: 'Equipo trabajando',
+      caption: 'Soluciones colaborativas'
     }
   ];
 
-  barChartData = {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Ventas',
-        data: [3000, 4500, 5000, 3500, 4800, 5100]
-      }
-    ]
-  };
+  paused = false;
+  unpauseOnArrow = false;
+  pauseOnIndicator = false;
+  pauseOnHover = true;
+  pauseOnFocus = true;
 
-  pieChartData = {
-    labels: ['Electrónica', 'Ropa', 'Alimentos', 'Otros'],
-    datasets: [
-      {
-        data: [40, 25, 20, 15],
-        backgroundColor: ['#0d6efd', '#20c997', '#ffc107', '#dc3545']
-      }
-    ]
-  };
+  // Productos destacados
+  featuredProducts = [
+    {
+      id: 1,
+      name: 'Plan Básico',
+      description: 'Ideal para pequeños negocios y emprendedores',
+      price: 29.99,
+      features: [
+        'Hasta 100 transacciones/mes',
+        '2 usuarios',
+        'Reportes básicos',
+        'Soporte por email'
+      ],
+      popular: false
+    },
+    {
+      id: 2,
+      name: 'Plan Profesional',
+      description: 'Para medianas empresas con necesidades avanzadas',
+      price: 79.99,
+      features: [
+        'Transacciones ilimitadas',
+        '5 usuarios',
+        'Reportes avanzados',
+        'Integración con bancos',
+        'Soporte prioritario'
+      ],
+      popular: true
+    },
+    {
+      id: 3,
+      name: 'Plan Empresarial',
+      description: 'Solución completa para grandes organizaciones',
+      price: 149.99,
+      features: [
+        'Transacciones ilimitadas',
+        'Usuarios ilimitados',
+        'Analítica predictiva',
+        'API de integración',
+        'Soporte 24/7',
+        'Entrenamiento personalizado'
+      ],
+      popular: false
+    }
+  ];
 
-  constructor() {}
+  // Testimonios
+  testimonials = [
+    {
+      name: 'María González',
+      position: 'Dueña de negocio',
+      content: 'ContaCloud ha transformado mi manera de manejar las finanzas de mi negocio. Ahora tengo todo bajo control en un solo lugar.',
+      avatar: 'https://randomuser.me/api/portraits/women/65.jpg'
+    },
+    {
+      name: 'Carlos Mendoza',
+      position: 'Contador independiente',
+      content: 'La mejor herramienta contable que he usado en mis 15 años de experiencia. Mis clientes están encantados con los reportes.',
+      avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
+    },
+    {
+      name: 'Laura Jiménez',
+      position: 'Directora Financiera',
+      content: 'La integración con nuestros sistemas bancarios nos ha ahorrado cientos de horas de trabajo manual. Excelente producto.',
+      avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
+    }
+  ];
 
-  ngOnInit(): void {}
+  // Estado del formulario de login/registro
+  showLoginForm: boolean | null = null;
+  loginData = { email: '', password: '' };
+  registerData = { name: '', email: '', password: '', confirmPassword: '' };
+
+  constructor(config: NgbCarouselConfig) {
+    // Configuración del carrusel
+    config.interval = 5000;
+    config.keyboard = true;
+    config.pauseOnHover = true;
+    config.showNavigationIndicators = true;
+    config.showNavigationArrows = true;
+  }
+
+  toggleForm() {
+    this.showLoginForm = !this.showLoginForm;
+  }
+
+  onLogin() {
+    // Lógica de inicio de sesión
+    console.log('Iniciando sesión', this.loginData);
+    // Aquí iría la llamada al servicio de autenticación
+  }
+
+  onRegister() {
+    // Lógica de registro
+    if (this.registerData.password !== this.registerData.confirmPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+    console.log('Registrando usuario', this.registerData);
+    // Aquí iría la llamada al servicio de registro
+  }
+
+  // Métodos para controlar el carrusel
+  togglePaused() {
+    if (this.paused) {
+      this.paused = false;
+    } else {
+      this.paused = true;
+    }
+  }
+
+  onSlide(slideEvent: NgbSlideEvent) {
+    if (
+      this.unpauseOnArrow &&
+      slideEvent.paused &&
+      (slideEvent.source === NgbSlideEventSource.ARROW_LEFT || slideEvent.source === NgbSlideEventSource.ARROW_RIGHT)
+    ) {
+      this.togglePaused();
+    }
+    if (
+      this.pauseOnIndicator &&
+      !slideEvent.paused &&
+      slideEvent.source === NgbSlideEventSource.INDICATOR
+    ) {
+      this.togglePaused();
+    }
+  }
 }

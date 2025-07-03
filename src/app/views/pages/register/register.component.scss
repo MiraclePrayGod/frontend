@@ -1,0 +1,199 @@
+.register-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+
+  .register-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .register-form {
+    .register-title {
+      color: #4a5568;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .register-subtitle {
+      color: #718096;
+      font-size: 0.9rem;
+    }
+
+    .input-field {
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+
+      &:focus-within {
+        .input-icon {
+          background-color: #667eea;
+          color: white;
+        }
+      }
+
+      .input-icon {
+        background-color: #edf2f7;
+        color: #4a5568;
+        transition: all 0.3s ease;
+      }
+
+      .input-control {
+        background-color: #f7fafc;
+        border-left: none;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+
+        &:focus {
+          box-shadow: none;
+          border-color: #cbd5e0;
+          background-color: white;
+        }
+      }
+    }
+
+    .password-strength {
+      .strength-meter {
+        height: 5px;
+        background-color: #e2e8f0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 0.25rem;
+
+        .strength-bar {
+          height: 100%;
+          transition: width 0.3s ease;
+
+          &.weak {
+            background-color: #e53e3e;
+          }
+
+          &.medium {
+            background-color: #dd6b20;
+          }
+
+          &.strong {
+            background-color: #38a169;
+          }
+        }
+      }
+
+      .strength-text {
+        color: #718096;
+        font-size: 0.75rem;
+
+        span {
+          font-weight: 600;
+        }
+      }
+    }
+
+    .register-button {
+      background: linear-gradient(to right, #667eea, #764ba2);
+      border: none;
+      padding: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    .login-link {
+      color: #718096;
+      font-size: 0.9rem;
+
+      a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #764ba2;
+        }
+      }
+    }
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .register-container {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  }
+
+  .register-card {
+    background-color: #2d3748 !important;
+    color: white;
+  }
+
+  .register-form {
+    .register-title {
+      color: #e2e8f0 !important;
+    }
+
+    .register-subtitle {
+      color: #a0aec0 !important;
+    }
+
+    .input-field {
+      .input-icon {
+        background-color: #4a5568 !important;
+        color: #e2e8f0 !important;
+      }
+
+      .input-control {
+        background-color: #4a5568 !important;
+        color: white !important;
+        border-color: #4a5568 !important;
+
+        &::placeholder {
+          color: #a0aec0 !important;
+        }
+
+        &:focus {
+          background-color: #2d3748 !important;
+        }
+      }
+    }
+
+    .login-link {
+      color: #a0aec0 !important;
+
+      a {
+        color: #7f9cf5 !important;
+      }
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .register-card {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}

@@ -1,0 +1,140 @@
+<div class="container">
+  <header class="header">
+    <h2><i class="bi bi-people-fill"></i> Gestión de Clientes</h2>
+    <div class="header-actions">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" [(ngModel)]="filtro" placeholder="Buscar cliente..." />
+      </div>
+      <div class="action-buttons">
+        <button class="btn-primary" *ngIf="!mostrarAgregar && !mostrarEditar"
+                (click)="mostrarAgregar = true; limpiarNuevoCliente(); clienteSeleccionado = null;">
+          <i class="bi bi-person-plus-fill"></i> Nuevo Cliente
+        </button>
+        <button class="btn-success" (click)="abrirModalVenta()" *ngIf="!mostrarAgregar && !mostrarEditar">
+          <i class="bi bi-cart-plus-fill"></i> Generar Venta
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabla de clientes -->
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>Tipo Doc</th>
+        <th>N° Documento</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let cliente of clientesFiltrados()" [class.inactive]="!cliente.estado">
+        <td>{{ cliente.id }}</td>
+        <td>{{ cliente.nombres }}</td>
+        <td>{{ cliente.apellidos }}</td>
+        <td>{{ cliente.tipoDocumento }}</td>
+        <td>{{ cliente.numeroDocumento }}</td>
+        <td><a href="mailto:{{cliente.correo}}" class="email-link">{{ cliente.correo }}</a></td>
+        <td><a href="tel:{{cliente.telefono}}" class="phone-link">{{ cliente.telefono }}</a></td>
+        <td>
+            <span class="status-badge" [class.active]="cliente.estado">
+              {{ cliente.estado ? 'Activo' : 'Inactivo' }}
+            </span>
+        </td>
+        <td class="actions">
+          <button class="btn-icon edit" (click)="editarCliente(cliente)" title="Editar">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="btn-icon delete" (click)="eliminarCliente(cliente.id!)" title="Eliminar">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+          <button class="btn-icon details" (click)="verDetalles(cliente)" title="Detalles">
+            <i class="bi bi-eye-fill"></i>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="table-footer">
+      <span class="total-items">Mostrando {{clientesFiltrados().length}} de {{clientes.length}} clientes</span>
+    </div>
+  </div>
+
+  <!-- Formulario de agregar o editar -->
+  <div class="modal-overlay" *ngIf="mostrarAgregar || mostrarEditar">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h3>{{ mostrarAgregar ? 'Agregar Nuevo Cliente' : 'Editar Cliente' }}</h3>
+      </div>
+
+      <form (ngSubmit)="mostrarAgregar ? agregarCliente() : guardarCliente()" #form="ngForm">
+        <div class="form-grid">
+          <ng-container *ngFor="let campo of campos">
+            <div class="form-group">
+              <label>{{ campo.label }}</label>
+              <input [(ngModel)]="(mostrarAgregar ? nuevoCliente : clienteSeleccionado)![campo.key]"
+                     name="{{campo.key}}"
+                     required
+                     #ctrl="ngModel"
+                     [ngClass]="{ 'invalid': ctrl.invalid && ctrl.touched }"
+              />
+              <span *ngIf="ctrl.invalid && ctrl.touched" class="error-message">Este campo es requerido</span>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cancelarForm()">Cancelar</button>
+          <button type="submit" class="btn-submit" [disabled]="form.invalid">
+            {{ mostrarAgregar ? 'Registrar Cliente' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Generar Venta -->
+  <div class="modal-overlay" *ngIf="mostrarFormularioVenta">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h3><i class="bi bi-cart-plus-fill"></i> Generar Nueva Venta</h3>
+        <button class="btn-icon close" (click)="cancelarVenta()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="instruction">Selecciona un cliente para asociar a la venta:</p>
+
+        <div class="client-list">
+          <div *ngFor="let cliente of clientesActivos"
+               class="client-card"
+               [class.selected]="cliente === clienteSeleccionadoVenta"
+               (click)="seleccionarClienteVenta(cliente)">
+            <div class="client-avatar">{{ cliente.nombres.charAt(0) }}{{ cliente.apellidos.charAt(0) }}</div>
+            <div class="client-info">
+              <h4>{{ cliente.nombres }} {{ cliente.apellidos }}</h4>
+              <p>{{ cliente.tipoDocumento }}: {{ cliente.numeroDocumento }}</p>
+              <p><i class="bi bi-telephone-fill"></i> {{ cliente.telefono }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelarVenta()">Cancelar</button>
+        <button class="btn-submit" (click)="confirmarVenta()" [disabled]="!clienteSeleccionadoVenta">
+          Continuar con la Venta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+   

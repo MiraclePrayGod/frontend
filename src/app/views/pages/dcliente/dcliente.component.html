@@ -1,1 +1,196 @@
-<router-outlet></router-outlet>
+<!-- Modal de Autenticación -->
+<div class="auth-modal" *ngIf="showLoginForm !== null">
+  <div class="auth-container">
+    <button class="close-btn" (click)="showLoginForm = null">&times;</button>
+
+    <!-- Login -->
+    <div *ngIf="showLoginForm === true" class="login-form">
+      <h2>Iniciar Sesión</h2>
+      <form (ngSubmit)="onLogin()">
+        <div class="form-group">
+          <label for="loginEmail">Correo Electrónico</label>
+          <input type="email" id="loginEmail" [(ngModel)]="loginData.email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <input type="password" id="loginPassword" [(ngModel)]="loginData.password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Ingresar</button>
+        <p class="toggle-form-text">
+          ¿No tienes cuenta?
+          <a href="#" (click)="toggleForm()">Regístrate aquí</a>
+        </p>
+      </form>
+    </div>
+
+    <!-- Registro -->
+    <div *ngIf="showLoginForm === false" class="register-form">
+      <h2>Crear Cuenta</h2>
+      <form (ngSubmit)="onRegister()">
+        <div class="form-group">
+          <label for="registerName">Nombre Completo</label>
+          <input type="text" id="registerName" [(ngModel)]="registerData.name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">Correo Electrónico</label>
+          <input type="email" id="registerEmail" [(ngModel)]="registerData.email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Contraseña</label>
+          <input type="password" id="registerPassword" [(ngModel)]="registerData.password" name="password" required>
+        </div>
+        <div class="form-group">
+          <label for="registerConfirmPassword">Confirmar Contraseña</label>
+          <input type="password" id="registerConfirmPassword" [(ngModel)]="registerData.confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrarse</button>
+        <p class="toggle-form-text">
+          ¿Ya tienes cuenta?
+          <a href="#" (click)="toggleForm()">Inicia sesión aquí</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Carrusel -->
+<section class="carousel-section">
+  <ngb-carousel
+    [interval]="5000"
+    [pauseOnHover]="pauseOnHover"
+    [wrap]="true"
+    (slide)="onSlide($event)"
+  >
+    <ng-template ngbSlide *ngFor="let image of carouselImages; let idx = index" id="slide-{{idx}}">
+      <img [src]="image.src" [alt]="image.alt" class="d-block w-100" />
+      <div class="carousel-caption d-none d-md-block">
+        <h5>{{ image.caption }}</h5>
+      </div>
+    </ng-template>
+  </ngb-carousel>
+</section>
+
+<!-- Sobre Nosotros -->
+<section class="about-section">
+  <div class="container">
+    <h2 class="section-title">¿Por qué elegir ContaCloud?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <i class="bi bi-cloud-check"></i>
+        <h3>En la Nube</h3>
+        <p>Accede a tu información desde cualquier lugar y dispositivo, siempre actualizada.</p>
+      </div>
+      <div class="feature-card">
+        <i class="bi bi-shield-lock"></i>
+        <h3>Seguro</h3>
+        <p>Tus datos protegidos con encriptación de última generación y copias de seguridad automáticas.</p>
+      </div>
+      <div class="feature-card">
+        <i class="bi bi-graph-up"></i>
+        <h3>Potente</h3>
+        <p>Herramientas avanzadas de análisis financiero para tomar mejores decisiones.</p>
+      </div>
+      <div class="feature-card">
+        <i class="bi bi-headset"></i>
+        <h3>Soporte</h3>
+        <p>Nuestro equipo de expertos está disponible para ayudarte cuando lo necesites.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Planes -->
+<section class="products-section">
+  <div class="container">
+    <h2 class="section-title">Nuestros Planes</h2>
+    <p class="section-subtitle">Elige el que mejor se adapte a las necesidades de tu negocio</p>
+
+    <div class="products-grid">
+      <div *ngFor="let product of featuredProducts" class="product-card" [class.popular]="product.popular">
+        <div *ngIf="product.popular" class="popular-badge">MÁS POPULAR</div>
+        <h3>{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        <div class="product-price">
+          <span class="currency">S/</span>
+          <span class="amount">{{ product.price }}</span>
+          <span class="period">/mes</span>
+        </div>
+        <ul class="product-features">
+          <li *ngFor="let feature of product.features">
+            <i class="bi bi-check-circle"></i> {{ feature }}
+          </li>
+        </ul>
+        <button class="btn btn-outline-primary">Seleccionar Plan</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonios -->
+<section class="testimonials-section">
+  <div class="container">
+    <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+    <div class="testimonials-grid">
+      <div *ngFor="let testimonial of testimonials" class="testimonial-card">
+        <div class="testimonial-content">
+          <p>"{{ testimonial.content }}"</p>
+        </div>
+        <div class="testimonial-author">
+          <img [src]="testimonial.avatar" [alt]="testimonial.name" class="author-avatar" />
+          <div class="author-info">
+            <strong>{{ testimonial.name }}</strong>
+            <span>{{ testimonial.position }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Llamado a la acción -->
+<section class="cta-section">
+  <div class="container">
+    <h2>¿Listo para transformar tu contabilidad?</h2>
+    <p>Regístrate hoy y obtén 15 días gratis para probar todas las funciones.</p>
+    <button class="btn btn-primary btn-lg">Comenzar Prueba Gratis</button>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="main-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <h3>ContaCloud</h3>
+        <p>La solución de gestión financiera en la nube para negocios de todos los tamaños.</p>
+        <div class="social-links">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-twitter"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Planes</a></li>
+          <li><a href="#">Características</a></li>
+          <li><a href="#">Preguntas Frecuentes</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Contacto</h4>
+        <ul>
+          <li><i class="bi bi-geo-alt"></i> Av. Ejemplo 123, Lima, Perú</li>
+          <li><i class="bi bi-telephone"></i> +51 123 456 789</li>
+          <li><i class="bi bi-envelope"></i> info&#64;contacloud.com</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2023 ContaCloud. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>

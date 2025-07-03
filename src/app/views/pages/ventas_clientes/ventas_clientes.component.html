@@ -1,1 +1,201 @@
-<p>ventas works!</p>
+<div class="app-container">
+  <!-- Header Principal -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon">🛍️</div>
+        <div class="logo-text">
+          <h1>Tienda Online</h1>
+          <p>Compras rápidas y seguras</p>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ productos.length }}</span>
+          <span class="stat-label">Productos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ detalles.length }}</span>
+          <span class="stat-label">En Carrito</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Sección Cliente -->
+    <section class="customer-section">
+      <div class="section-header">
+        <div class="section-icon">👤</div>
+        <h2>Información del Cliente</h2>
+      </div>
+      <div class="customer-form">
+        <div class="form-field">
+          <label for="cliente-select">Seleccionar Cliente</label>
+          <div class="select-wrapper">
+            <select id="cliente-select" [(ngModel)]="clienteId" class="modern-select">
+              <option value="">Seleccione un cliente...</option>
+              <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                {{ cliente.nombres }} {{ cliente.apellidos }} - {{ cliente.numeroDocumento }}
+              </option>
+            </select>
+            <div class="select-arrow">▼</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Sección Productos -->
+    <section class="products-section">
+      <div class="section-header">
+        <div class="section-icon">📦</div>
+        <h2>Catálogo de Productos</h2>
+        <div class="products-count">{{ productos.length }} productos disponibles</div>
+      </div>
+
+      <div class="products-grid">
+        <article class="product-card" *ngFor="let producto of productos"
+                 [class.low-stock]="producto.stock < 5">
+          <div class="product-badge" *ngIf="producto.stock < 5">
+            <span>⚠️ Stock bajo</span>
+          </div>
+
+          <div class="product-image-container">
+            <div class="product-image-wrapper">
+              <img [src]="producto.imagenUrl || 'assets/default-product.png'"
+                   [alt]="producto.nombre"
+                   class="product-image"
+                   loading="lazy"
+                   onerror="this.src='assets/default-product.png'">
+            </div>
+            <div class="image-overlay">
+              <div class="stock-indicator">
+                <span class="stock-count">{{ producto.stock }}</span>
+                <span class="stock-label">disponibles</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-content">
+            <header class="product-header">
+              <h3 class="product-name">{{ producto.nombre }}</h3>
+              <div class="product-price">
+                <span class="currency">S/</span>
+                <span class="amount">{{ producto.precioUnitario.toFixed(2) }}</span>
+              </div>
+            </header>
+
+            <p class="product-description">{{ producto.descripcion }}</p>
+
+            <div class="product-actions">
+              <div class="quantity-selector">
+                <label for="qty-{{producto.id}}" class="qty-label">Cantidad:</label>
+                <input type="number"
+                       id="qty-{{producto.id}}"
+                       [(ngModel)]="cantidades[producto.id]"
+                       min="1"
+                       [max]="producto.stock"
+                       value="1"
+                       class="quantity-input">
+              </div>
+              <button class="add-to-cart-btn"
+                      (click)="agregarAlCarrito(producto)"
+                      [disabled]="producto.stock === 0">
+                <span class="btn-icon">🛒</span>
+                <span class="btn-text">{{ producto.stock === 0 ? 'Agotado' : 'Agregar' }}</span>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Carrito de Compras -->
+    <aside class="cart-section" *ngIf="detalles.length > 0" [@slideIn]>
+      <div class="cart-container">
+        <header class="cart-header">
+          <div class="cart-title">
+            <div class="section-icon">🛒</div>
+            <h2>Carrito de Compras</h2>
+          </div>
+          <div class="cart-count">{{ detalles.length }} productos</div>
+        </header>
+
+        <div class="cart-items">
+          <div class="cart-item" *ngFor="let detalle of detalles; trackBy: trackByProductId">
+            <div class="item-image-wrapper">
+              <img [src]="obtenerImagenProducto(detalle.productoId)"
+                   [alt]="obtenerNombreProducto(detalle.productoId)"
+                   class="item-image">
+            </div>
+
+            <div class="item-details">
+              <h4 class="item-name">{{ obtenerNombreProducto(detalle.productoId) }}</h4>
+              <div class="item-quantity">
+                <span>{{ detalle.cantidad }} × S/ {{ detalle.precioUnitario.toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <div class="item-actions">
+              <div class="item-subtotal">
+                S/ {{ (detalle.cantidad * detalle.precioUnitario).toFixed(2) }}
+              </div>
+              <button class="remove-item-btn"
+                      (click)="removerDetalle(detalle.productoId)"
+                      title="Eliminar producto">
+                <span>🗑️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <footer class="cart-footer">
+          <div class="cart-total">
+            <div class="total-label">Total a Pagar:</div>
+            <div class="total-amount">S/ {{ calcularTotal().toFixed(2) }}</div>
+          </div>
+
+          <button class="checkout-btn"
+                  (click)="generarVenta()"
+                  [disabled]="!clienteId || detalles.length === 0">
+            <span class="btn-icon">💳</span>
+            <span class="btn-text">Finalizar Compra</span>
+            <div class="btn-shine"></div>
+          </button>
+        </footer>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Notificación de Venta Exitosa -->
+  <div class="sale-success-modal" *ngIf="showSuccessModal">
+    <div class="modal-content">
+      <div class="success-icon">🎉</div>
+      <h3>¡Venta Generada con Éxito!</h3>
+      <p>Gracias por su compra. Su pedido ha sido procesado correctamente.</p>
+      <div class="sale-details">
+        <div class="detail-item">
+          <span class="detail-label">Número de Productos:</span>
+          <span class="detail-value">{{ detalles.length }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Total Pagado:</span>
+          <span class="detail-value">S/ {{ calcularTotal().toFixed(2) }}</span>
+        </div>
+      </div>
+      <button class="close-modal-btn" (click)="showSuccessModal = false">
+        Cerrar
+      </button>
+    </div>
+  </div><!-- Notificaciones -->
+  <div class="notifications">
+    <div class="notification success" *ngIf="mensaje" [@fadeInOut]>
+      <span class="notification-icon">✅</span>
+      <span class="notification-text">{{ mensaje }}</span>
+    </div>
+
+    <div class="notification error" *ngIf="error" [@fadeInOut]>
+      <span class="notification-icon">❌</span>
+      <span class="notification-text">{{ error }}</span>
+    </div>
+  </div>
+</div>

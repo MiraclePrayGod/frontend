@@ -1,0 +1,132 @@
+<div class="container" [class.form-active]="mostrarAgregar || mostrarEditar">
+  <h2 class="title">🛒 Gestión de Productos <span class="badge">{{productosFiltrados().length}} productos</span></h2>
+
+  <div class="top-bar">
+    <div class="search-container">
+      <input type="text" [(ngModel)]="filtro" placeholder="🔍 Buscar producto..." class="search-input" />
+      <span class="search-hint">Filtrando por: {{filtro || 'ningún criterio'}}</span>
+    </div>
+
+    <button *ngIf="!mostrarAgregar && !mostrarEditar"
+            (click)="mostrarAgregar = true; limpiarNuevoProducto(); productoSeleccionado = null;"
+            class="add-button pulse-animation">
+      ➕ Nuevo Producto
+    </button>
+  </div>
+
+  <div class="card-container" *ngIf="!mostrarAgregar && !mostrarEditar; else formView">
+    <div class="product-card" *ngFor="let producto of productosFiltrados()"
+         [class.highlight]="producto.stock < 5" [class.new]=" (producto)">
+      <div class="card-header">
+        <h3>{{ producto.nombre }}</h3>
+        <span class="price-tag">S/ {{ producto.precioUnitario | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="image-container">
+        <img [src]="producto.imagenUrl || placeholderImg" alt="{{ producto.nombre }}"
+             (error)="producto.imagenUrl = placeholderImg" />
+        <span class="stock-badge" [class.low-stock]="producto.stock < 5">
+              {{ producto.stock }} en stock
+            </span>
+      </div>
+
+      <div class="card-details">
+        <p><strong class="detail-label">Categoría:</strong> {{ producto.categoria || 'Sin categoría' }}</p>
+        <p class="description"><strong class="detail-label">Descripción:</strong> {{ producto.descripcion || 'Sin descripción' }}</p>
+        <p><strong class="detail-label">Estado:</strong>
+          <span [class.activo]="producto.estado" [class.inactivo]="!producto.estado">
+                {{ producto.estado ? 'Activo ✅' : 'Inactivo ❌' }}
+              </span>
+        </p>
+        <p class="creation-date"><strong class="detail-label">Creado:</strong> {{ producto.fechaCreacion | date:'mediumDate' }}</p>
+      </div>
+
+      <div class="card-buttons">
+        <button class="edit-btn" (click)="editarProducto(producto)">
+          <span class="icon">✏️</span> Editar
+        </button>
+        <button class="delete-btn" (click)="eliminarProducto(producto.id!)">
+          <span class="icon">🗑️</span> Eliminar
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="productosFiltrados().length === 0">
+      <p>No se encontraron productos</p>
+      <button (click)="mostrarAgregar = true; limpiarNuevoProducto()" class="add-button">
+        ➕ Crear primer producto
+      </button>
+    </div>
+  </div>
+
+  <ng-template #formView>
+    <div class="form-container slide-in">
+      <form (ngSubmit)="mostrarAgregar ? agregarProducto() : guardarProducto()" #form="ngForm">
+        <h3>{{ mostrarAgregar ? '➕ Agregar Producto' : '✏️ Editar Producto' }}</h3>
+
+        <div class="form-grid">
+          <label class="form-group">
+            <span class="form-label">Nombre</span>
+            <input [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.nombre"
+                   name="nombre" type="text" required #ctrlNombre="ngModel"
+                   [class.invalid]="ctrlNombre.invalid && ctrlNombre.touched" />
+            <span *ngIf="ctrlNombre.invalid && ctrlNombre.touched" class="error-message">⚠️ Campo requerido</span>
+          </label>
+
+          <label class="form-group">
+            <span class="form-label">Categoría</span>
+            <input [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.categoria"
+                   name="categoria" type="text" />
+          </label>
+
+          <label class="form-group span-2">
+            <span class="form-label">Descripción</span>
+            <textarea [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.descripcion"
+                      name="descripcion" rows="3"></textarea>
+          </label>
+
+          <label class="form-group">
+            <span class="form-label">Precio Unitario (S/)</span>
+            <input [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.precioUnitario"
+                   name="precioUnitario" type="number" step="0.01" required #ctrlPrecio="ngModel"
+                   [class.invalid]="ctrlPrecio.invalid && ctrlPrecio.touched" />
+            <span *ngIf="ctrlPrecio.invalid && ctrlPrecio.touched" class="error-message">⚠️ Precio inválido</span>
+          </label>
+
+          <label class="form-group">
+            <span class="form-label">Stock</span>
+            <input [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.stock"
+                   name="stock" type="number" required #ctrlStock="ngModel"
+                   [class.invalid]="ctrlStock.invalid && ctrlStock.touched" />
+            <span *ngIf="ctrlStock.invalid && ctrlStock.touched" class="error-message">⚠️ Stock inválido</span>
+          </label>
+
+          <label class="form-group span-2">
+            <span class="form-label">URL Imagen</span>
+            <input [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.imagenUrl"
+                   name="imagenUrl" type="url" />
+            <span class="hint">Dejar vacío para usar imagen predeterminada</span>
+          </label>
+
+          <label class="form-group">
+            <span class="form-label">Estado</span>
+            <select [(ngModel)]="(mostrarAgregar ? nuevoProducto : productoSeleccionado)!.estado"
+                    name="estado" required class="status-select">
+              <option [ngValue]="true">🟢 Activo</option>
+              <option [ngValue]="false">🔴 Inactivo</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="form.invalid" class="submit-button">
+            {{ mostrarAgregar ? '💾 Registrar Producto' : '💾 Guardar Cambios' }}
+          </button>
+          <button type="button" (click)="cancelarForm()" class="cancel-button">
+            ❌ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+</div>

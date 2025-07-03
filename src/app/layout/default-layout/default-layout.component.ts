@@ -17,6 +17,7 @@ import {
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
+import {CommonModule} from "@angular/common";
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -26,10 +27,12 @@ function isOverflown(element: HTMLElement) {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-dashboard',
   templateUrl: './default-layout.component.html',
   styleUrls: ['./default-layout.component.scss'],
   imports: [
+    CommonModule, // ✅ agrega esta línea
     SidebarComponent,
     SidebarHeaderComponent,
     SidebarBrandComponent,

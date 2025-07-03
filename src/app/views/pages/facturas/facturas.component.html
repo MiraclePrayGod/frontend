@@ -1,0 +1,39 @@
+<div class="facturas-container">
+  <h2>🧾 Facturas por Cliente</h2>
+  <div class="facturas-bar">
+    <input type="number" [(ngModel)]="clienteId" (ngModelChange)="buscarFacturas()" placeholder="ID de Cliente" />
+  </div>
+
+  <div *ngIf="loading" class="facturas-loading">Cargando facturas...</div>
+  <div *ngIf="error" class="facturas-error">{{ error }}</div>
+
+  <div class="facturas-list">
+    <div class="factura-card" *ngFor="let factura of facturas">
+      <div class="factura-header">
+        <h3>Factura #{{ factura.numeroFactura }}</h3>
+        <span class="factura-fecha">{{ factura.fechaEmision | date:'mediumDate' }}</span>
+      </div>
+      <div class="factura-body">
+        <p><strong>Cliente:</strong> {{ factura.cliente?.nombre || '-' }}</p>
+        <p><strong>Moneda:</strong> {{ factura.moneda }}</p>
+        <p><strong>Total:</strong> <span class="factura-total">S/ {{ factura.total | number:'1.2-2' }}</span></p>
+      </div>
+      <div class="factura-items">
+        <h4>Productos</h4>
+        <ul>
+          <li *ngFor="let item of factura.items">
+            {{ item.cantidad }} x {{ item.nombreProducto }} <span class="item-total">S/ {{ item.totalLinea | number:'1.2-2' }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="factura-actions">
+        <button (click)="descargarFacturaPdf(factura.id)">Descargar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && busquedaRealizada && facturas.length === 0" class="facturas-empty">
+    No hay facturas para este cliente.
+  </div>
+</div>
+
