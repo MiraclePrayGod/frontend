@@ -73,6 +73,11 @@ export const navItems: INavData[] = [
         icon: 'nav-icon-bullet'
       },
       {
+        name: 'reportes',
+        url: '/pages/reportes',
+        icon: 'nav-icon-bullet' 
+      },
+      {
         name: 'Error 500',
         url: '/500',
         icon: 'nav-icon-bullet'

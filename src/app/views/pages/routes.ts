@@ -65,6 +65,14 @@ export const routes: Routes = [
       title: 'dcliente'
     }
   },
+    {
+
+    path: 'reportes',
+    loadComponent: () => import('./reportes/reportes.component').then(m => m.ReportesComponent),
+    data: {
+      title: 'reportes'
+    }
+  },
 
 
 

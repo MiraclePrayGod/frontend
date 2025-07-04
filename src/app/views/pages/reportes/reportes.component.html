@@ -1,17 +1,91 @@
 <div class="container">
-  <h2>📊 Reportes</h2>
-  <div style="max-width: 400px; margin: auto;">
-    <canvas baseChart
-      [data]="chartData"
-      [type]="chartType">
-    </canvas>
+  <h2>📊 Reporte General</h2>
+
+  <div class="reporte-section">
+    <h3>Resumen de Ventas por Estado</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Estado</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of resumenVentas">
+          <td>{{ item.estado }}</td>
+          <td>{{ item.cantidad }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div class="info">
-    <h3>Resumen de Ventas</h3>
-    <ul>
-      <li *ngFor="let estado of chartData.labels; let i = index">
-        {{ estado }}: {{ chartData.datasets[0].data[i] }}
-      </li>
-    </ul>
+
+  <div class="reporte-section">
+    <h3>Productos más vendidos</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Stock</th>
+          <th>Precio Unitario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prod of productos">
+          <td>{{ prod.nombre }}</td>
+          <td>{{ prod.stock }}</td>
+          <td>S/ {{ prod.precioUnitario }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="reporte-section">
+    <h3>Pagos Registrados</h3>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Venta</th>
+          <th>Método</th>
+          <th>Monto</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pago of pagos">
+          <td>{{ pago.id }}</td>
+          <td>{{ pago.ventaId }}</td>
+          <td>{{ pago.metodo }}</td>
+          <td>S/ {{ pago.monto }}</td>
+          <td>{{ pago.fechaPago }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="reporte-section">
+    <h3>Licencias Emitidas</h3>
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Activación</th>
+          <th>Expiración</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lic of licencias">
+          <td>{{ lic.id }}</td>
+          <td>{{ lic.clienteId }}</td>
+          <td>{{ lic.tipoLicencia }}</td>
+          <td>{{ lic.fechaActivacion }}</td>
+          <td>{{ lic.fechaExpiracion }}</td>
+          <td>{{ lic.estado }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
